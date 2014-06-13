@@ -2,8 +2,10 @@ prj-exedemo/bin
 prj-exedemo/.classpath
 prj-exedemo/.settings
 prj-exedemo/gen
+prj-exedemo/.project
 prj-libdemo/bin
 prj-libdemo/.classpath
 prj-libdemo/.settings
 prj-libdemo/gen
+prj-libdemo/.project
 .gradle
