@@ -1,0 +1,7 @@
+prj-libdemo/bin
+prj-exedemo/bin
+prj-exedemo/.classpath
+prj-exedemo/.settings
+prj-libdemo/.classpath
+prj-libdemo/.settings
+.gradle
