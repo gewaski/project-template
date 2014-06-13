@@ -1,0 +1,111 @@
+allprojects {
+
+}
+
+subprojects  {
+
+	buildscript {
+		repositories {
+			mavenCentral()
+            maven {url 'file:/home/alucard/workspace/java_project/common_libs'}
+		}
+
+		dependencies {
+			classpath "net.saliman:gradle-cobertura-plugin:1.1.1"
+			classpath group: 'com.gradle.plugins.mconf', name: 'gradle-mconf-plugin', version: '4.0-SNAPSHOT'
+		}
+
+		configurations.all {
+			resolutionStrategy {
+				cacheDynamicVersionsFor 10, 'seconds'
+				cacheChangingModulesFor 0, 'seconds'
+			}
+		}
+	}
+
+	repositories {
+			mavenCentral()
+	}
+
+	apply plugin: 'eclipse'
+	apply plugin: 'java'
+	apply plugin: 'findbugs'
+	
+	apply from: '../gradle/eclipse.gradle'
+
+	configurations {
+		all*.exclude group: 'log4j', module: 'log4j'
+	}
+	dependencies {
+		compile 'org.apache.logging.log4j:log4j-api:2.0-beta9'
+		compile 'org.apache.logging.log4j:log4j-core:2.0-beta9'
+		compile 'org.apache.logging.log4j:log4j-jcl:2.0-beta9'
+		compile 'org.apache.logging.log4j:log4j-1.2-api:2.0-beta9'
+		compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.0-beta9'
+        compile fileTree(dir: libDir, include: '*.jar')
+	}
+	
+    tasks.withType(Compile) { options.encoding = 'UTF-8' }
+	tasks.withType(Javadoc) { options.encoding = 'UTF-8' }
+	
+	group = 'com.xxx.yyy'
+	
+	sourceCompatibility = 1.6
+	targetCompatibility = 1.6
+	
+
+	findbugs {
+		toolVersion = "2.0.1"
+		sourceSets = [sourceSets.main]
+		ignoreFailures = true
+	}
+	
+	afterEvaluate { Project project ->
+
+		cobertura {
+			coverageFormats = ['xml','html']
+			coverageIgnoreTrivial = true
+		}
+		sourceSets {
+			test {
+				resources {
+					srcDir 'src/test/static-resources'
+					srcDir 'gen/app-resources'
+					srcDir 'gen/test-resources'
+				}
+			}
+			main {
+				resources {
+					srcDir 'src/main/static-resources'
+				}
+			}
+		}
+
+		eclipse.classpath.file{
+				whenMerged { classpath ->
+					def testRefs  = classpath.entries.findAll{entry -> entry.kind =='src' && entry.path.contains('src/test/java')}
+					classpath.entries.removeAll(testRefs)
+					classpath.entries.addAll(2,testRefs)
+					def teststaticRefs  = classpath.entries.findAll{entry -> entry.kind =='src' && entry.path.contains('src/test/static-resources')}
+					classpath.entries.removeAll(teststaticRefs)
+					classpath.entries.addAll(3,teststaticRefs)
+					def testResRefs  = classpath.entries.findAll{entry -> entry.kind =='src' && entry.path.contains('gen/test-resources')}
+					classpath.entries.removeAll(testResRefs)
+					classpath.entries.addAll(4,testResRefs)
+					def mainGenRefs  = classpath.entries.findAll{entry -> entry.kind =='src' && entry.path.contains('gen/app-resources')}
+					classpath.entries.removeAll(mainGenRefs)
+					classpath.entries.addAll(5,mainGenRefs)
+				}
+			}
+ 	}
+	tasks.clean.delete << project.rootProject.file('output')
+	tasks.clean.delete << project.rootProject.file('output_zip')
+}
+
+task buildTar (type: Tar) {
+	archiveName='prj.tar.gz'
+	compression=Compression.GZIP
+	destinationDir = project.file('output')
+	from 'output_zip'
+}
+

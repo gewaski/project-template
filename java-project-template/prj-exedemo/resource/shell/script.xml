@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." name="prj-exe">
+  <property environment="env"/>
+
+  <property name="deploy_path" value="." />
+	
+   <property name="classes.dir" value="${deploy_path}/" />
+  <property name="lib.dir" value="${deploy_path}/lib" />
+  <property name="conf.dir" value="${deploy_path}/conf" />
+
+  <path id="project.classpath">
+    <fileset dir="${lib.dir}"><include name="**/*.jar"/></fileset>
+    <fileset dir="${classes.dir}"><include name="*.jar"/></fileset>
+	<pathelement path="${conf.dir}"/>
+  </path>
+
+	<target name="ExeDemo">
+	    <java classname="com.xxx.yyy.ExeDemo"
+	          maxmemory="8192m" fork="true" failonerror="true" inputstring="">
+	      	  <classpath refid="project.classpath"/>
+	    	  <jvmarg value="-Djava.library.path=./"/>
+	          <arg line="${CMD}" />
+	    </java>
+	  </target>
+
+</project>
